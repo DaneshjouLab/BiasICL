@@ -8,7 +8,8 @@ from LMM import GPT4VAPI, GeminiAPI, ClaudeAPI
 import pandas as pd
 
 
-def create_demo(female, male, random_seed=141):
+def create_demo(female: int, male: int, random_seed: int = 141) -> pd.DataFrame:
+    """Create a demo dataframe from the given number of female and male samples."""
     dataset_name = "chexpert_binary_PNA"
     demo_frame = pd.read_csv(f"/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/{dataset_name}/demo.csv", index_col=0)
     total_samples = female + male
@@ -39,15 +40,16 @@ def create_demo(female, male, random_seed=141):
 
     return final_demo_frame
 
-def main(
-    model,
-    female, 
-    male,
-    num_qns_per_round,
-    detail="auto",
-    random_seed=141,
-):
 
+def main(
+    model: str,
+    female: int, 
+    male: int,
+    num_qns_per_round: int,
+    detail: str = "auto",
+    random_seed: int = 141,
+):
+    """Main function to run the experiment."""
     EXP_NAME = f"chexpert_sex_{female}_{male}_{model}_{num_qns_per_round}"
     
     demo_frame = create_demo(female, male, random_seed)
