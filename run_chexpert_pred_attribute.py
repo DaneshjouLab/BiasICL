@@ -146,17 +146,17 @@ Do not deviate from the above format. Repeat the format template for the answer.
 
         
 if __name__ == "__main__":    
-    # main("gpt-4o-2024-05-13",
-    #     0, 0,
-    #     50,)
+    main("gpt-4o-2024-05-13",
+        0, 0,
+        50,)
     
-    # main("Gemini1.5",
-    #     0, 0,
-    #     50,)
+    main("Gemini1.5",
+        0, 0,
+        50,)
 
-    # main("claude",
-    #     0, 0,
-    #     50,)
+    main("claude",
+        0, 0,
+        50,)
 
     for model in ["Gemini1.5", "gpt-4o-2024-05-13", "claude"]:
         for seed in [10]:  
