@@ -1,3 +1,10 @@
+# This source file is part of the Daneshjou Lab projects
+#
+# SPDX-FileCopyrightText: 2025 Stanford University and the project authors (see AUTHORS.md)
+#
+# SPDX-License-Identifier: MIT
+# 
+
 import traceback
 import os
 from tqdm import tqdm

@@ -1,13 +1,22 @@
+# This source file is part of the Daneshjou Lab projects
+#
+# SPDX-FileCopyrightText: 2025 Stanford University and the project authors (see AUTHORS.md)
+#
+# SPDX-License-Identifier: MIT
+#
+
+
+# Standard library imports
 import os
 import pickle
 import random
 import time
 import traceback
 
+# Third-party imports
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-
 from LMM import GPT4VAPI, ClaudeAPI, GeminiAPI
 
 

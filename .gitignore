@@ -2,7 +2,7 @@
 #
 # SPDX-FileCopyrightText: 2025 Stanford University and the project authors (see AUTHORS.md)
 #
-# SPDX-License-Identifier: Apache
+# SPDX-License-Identifier: MIT
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

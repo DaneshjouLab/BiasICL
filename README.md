@@ -1,3 +1,13 @@
+<!--
+
+This source file is part of the the  Daneshjou Lab projects.
+
+SPDX-FileCopyrightText: 2025 Stanford University and the project authors (see CONTRIBUTORS.md)
+
+SPDX-License-Identifier: MIT
+
+-->
+
 # BiasICL
 
 # In-Context Learning and Demographic Biases of Vision Language Models

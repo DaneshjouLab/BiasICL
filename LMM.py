@@ -1,25 +1,34 @@
+# This source file is part of the Daneshjou Lab projects
+#
+# SPDX-FileCopyrightText: 2025 Stanford University and the project authors (see AUTHORS.md)
+#
+# SPDX-License-Identifier: MIT
+# 
+
 import base64
-import time
-import pickle
 import os
-import uuid
-import pandas as pd
-from tqdm import tqdm
-import traceback
+import pickle
 import random
-from PIL import Image
-from dotenv import load_dotenv
+import time
+import traceback
+import uuid
 from io import BytesIO
+
+import pandas as pd
 import tenacity
-import base64
+from dotenv import load_dotenv
+from PIL import Image
+from tqdm import tqdm
 
 # Load environment variables
 load_dotenv()
 
-from openai import OpenAI
 import google.generativeai as genai
+from openai import OpenAI
+
 genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 import anthropic
+
 
 class ClaudeAPI:
     def __init__(
