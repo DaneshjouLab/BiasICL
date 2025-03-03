@@ -15,7 +15,25 @@ on:
 jobs:
   reuse_action:
     name: REUSE Compliance Check
-    uses: DaneshjouLab/.github/.github/workflows/reuse.yml@main
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Cache REUSE tool data
+        uses: actions/cache@v3
+        with:
+          path: .reuse
+          key: ${{ runner.os }}-reuse-${{ hashFiles('**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-reuse-
+
+      - name: Install REUSE tool
+        run: pip install reuse
+
+      - name: Run REUSE lint with verbose output
+        run: reuse lint -v
   markdown_link_check:
     name: Markdown Link Check
     uses: DaneshjouLab/.github/.github/workflows/markdown-link-check.yml@main
