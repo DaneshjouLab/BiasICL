@@ -1,76 +1,113 @@
-import traceback
+# Standard library imports
 import os
-from tqdm import tqdm
-import random
 import pickle
+import random
+import traceback
+
+# Third-party imports
 import numpy as np
-from LMM import GPT4VAPI, GeminiAPI, ClaudeAPI
 import pandas as pd
+from tqdm import tqdm
+from LMM import GPT4VAPI, ClaudeAPI, GeminiAPI
+
 
 rare_diseases = {
-        'subcutaneous-t-cell-lymphoma', 'focal-acral-hyperkeratosis', 
-        'eccrine-poroma', 'inverted-follicular-keratosis', 'kaposi-sarcoma',
-        'metastatic-carcinoma', 'mycosis-fungoides', 
-        'acquired-digital-fibrokeratoma', 'atypical-spindle-cell-nevus-of-reed',
-        'verruciform-xanthoma', 'morphea', 'nevus-lipomatosus-superficialis',
-        'pigmented-spindle-cell-nevus-of-reed', 'arteriovenous-hemangioma',
-        'syringocystadenoma-papilliferum', 'trichofolliculoma',
-        'coccidioidomycosis', 'leukemia-cutis', 'sebaceous-carcinoma',
-        'blastic-plasmacytoid-dendritic-cell-neoplasm', 'glomangioma',
-        'dermatomyositis', 'cellular-neurothekeoma', 'graft-vs-host-disease',
-        'xanthograngioma', 'chondroid-syringoma', 'angioleiomyoma'
-    }
+    "subcutaneous-t-cell-lymphoma",
+    "focal-acral-hyperkeratosis",
+    "eccrine-poroma",
+    "inverted-follicular-keratosis",
+    "kaposi-sarcoma",
+    "metastatic-carcinoma",
+    "mycosis-fungoides",
+    "acquired-digital-fibrokeratoma",
+    "atypical-spindle-cell-nevus-of-reed",
+    "verruciform-xanthoma",
+    "morphea",
+    "nevus-lipomatosus-superficialis",
+    "pigmented-spindle-cell-nevus-of-reed",
+    "arteriovenous-hemangioma",
+    "syringocystadenoma-papilliferum",
+    "trichofolliculoma",
+    "coccidioidomycosis",
+    "leukemia-cutis",
+    "sebaceous-carcinoma",
+    "blastic-plasmacytoid-dendritic-cell-neoplasm",
+    "glomangioma",
+    "dermatomyositis",
+    "cellular-neurothekeoma",
+    "graft-vs-host-disease",
+    "xanthograngioma",
+    "chondroid-syringoma",
+    "angioleiomyoma",
+}
 
-def create_demo(fst12, fst56, filter_rare = False, random_seed=141):
+
+def create_demo(fst12, fst56, filter_rare=False, random_seed=141):
     dataset_name = "DDI"
-    demo_frame = pd.read_csv(f"/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/{dataset_name}/ddi_demo_metadata.csv", index_col=0)
+    demo_frame = pd.read_csv(
+        f"/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/{dataset_name}/ddi_demo_metadata.csv",
+        index_col=0,
+    )
     if filter_rare:
         demo_frame = demo_frame[~demo_frame.disease.isin(rare_diseases)]
-    
+
     total_samples = fst12 + fst56
-    
+
     fst56_frame = demo_frame[demo_frame.skin_tone == 56]
     if len(fst56_frame) < fst56:
-        print(f"Warning: not enough samples for skin tone 56, taking the max available {len(fst56_frame)}")
+        print(
+            f"Warning: not enough samples for skin tone 56, taking the max available {len(fst56_frame)}"
+        )
         fst56_frame = fst56_frame.sample(len(fst56_frame), random_state=random_seed)
     else:
         fst56_frame = fst56_frame.sample(fst56, random_state=random_seed)
-    
+
     fst12_frame = demo_frame[demo_frame.skin_tone == 12]
     if len(fst12_frame) < fst12:
-        print(f"Warning: not enough samples for skin tone 12, taking the max available {len(fst12_frame)}")
+        print(
+            f"Warning: not enough samples for skin tone 12, taking the max available {len(fst12_frame)}"
+        )
         fst12_frame = fst12_frame.sample(len(fst12_frame), random_state=random_seed)
     else:
         fst12_frame = fst12_frame.sample(fst12, random_state=random_seed)
-    
-    
+
     final_demo_frame = pd.concat([fst56_frame, fst12_frame])
-    
+
     if len(final_demo_frame) < total_samples:
-        print(f"Warning: not enough total samples, taking the max available {len(final_demo_frame)}")
-        final_demo_frame = final_demo_frame.sample(len(final_demo_frame), random_state=random_seed)
+        print(
+            f"Warning: not enough total samples, taking the max available {len(final_demo_frame)}"
+        )
+        final_demo_frame = final_demo_frame.sample(
+            len(final_demo_frame), random_state=random_seed
+        )
     else:
-        final_demo_frame = final_demo_frame.sample(total_samples, random_state=random_seed) # sample full num to shuffle
+        final_demo_frame = final_demo_frame.sample(
+            total_samples, random_state=random_seed
+        )  # sample full num to shuffle
     return final_demo_frame
+
 
 def main(
     model,
     fst12,
     fst56,
     num_qns_per_round,
-    filter_rare = False,
+    filter_rare=False,
     detail="auto",
-    random_seed=141
+    random_seed=141,
 ):
 
-#     class_to_idx = {class_name: idx for idx, class_name in enumerate(classes)}
+    #     class_to_idx = {class_name: idx for idx, class_name in enumerate(classes)}
     EXP_NAME = f"ddi_fst_{fst12}_{fst56}_{model}_{num_qns_per_round}"
-    
+
     demo_frame = create_demo(fst12, fst56, random_seed=random_seed)
 
     dataset_name = "DDI"
-    test_df = pd.read_csv(f"/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/{dataset_name}/ddi_test_metadata.csv", index_col=0)
-    if filter_rare: 
+    test_df = pd.read_csv(
+        f"/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/{dataset_name}/ddi_test_metadata.csv",
+        index_col=0,
+    )
+    if filter_rare:
         test_df = test_df[~test_df.disease.isin(rare_diseases)]
 
     if model.startswith("gpt") or model.startswith("o1"):
@@ -87,12 +124,12 @@ def main(
     # i[0] = (path_to_image, class name)
     demo_paths = []
     demo_labels = []
-    for i,row in demo_frame.iterrows():
+    for i, row in demo_frame.iterrows():
         ans_choice = "B" if row.skin_tone == 56 else "A"
-        demo_paths.append('/home/groups/roxanad/ddi/' + row.DDI_file)
+        demo_paths.append("/home/groups/roxanad/ddi/" + row.DDI_file)
         demo_labels.append(ans_choice)
     demo_examples = list(zip(demo_paths, demo_labels))
-    
+
     # Load existing results
     if os.path.isfile(f"{EXP_NAME}.pkl"):
         with open(f"{EXP_NAME}.pkl", "rb") as f:
@@ -104,11 +141,9 @@ def main(
     for start_idx in tqdm(range(0, len(test_df), num_qns_per_round), desc=EXP_NAME):
         end_idx = min(len(test_df), start_idx + num_qns_per_round)
 
-#         random.shuffle(demo_examples)  already shuffled so don't need to do this 
+        #         random.shuffle(demo_examples)  already shuffled so don't need to do this
         prompt = "Please respond with the following format for each question, in the form of a single capital letter specifying which label best describes the image. Do not deviate from the format, because it will be automatically parsed."
-        image_paths = [
-            i[0] for i in demo_examples
-        ]
+        image_paths = [i[0] for i in demo_examples]
         for demo in demo_examples:
             prompt += f"""<<IMG>>Given the image above, answer the following question using the specified format. 
 Question: What skin tone does the person in the image have?
@@ -118,7 +153,7 @@ Answer Choice: {demo[1]}
         qns_idx = []
         for idx, i in enumerate(test_df.iloc[start_idx:end_idx].itertuples()):
             qns_idx.append(i.Index)
-            image_paths.append('/home/groups/roxanad/ddi/' + i.DDI_file)
+            image_paths.append("/home/groups/roxanad/ddi/" + i.DDI_file)
             qn_idx = idx + 1
 
             prompt += f"""<<IMG>>Given the image above, answer the following question using the specified format. 
@@ -166,7 +201,7 @@ Do not deviate from the above format. Repeat the format template for the answer.
                             real_call=True,
                             max_tokens=60 * num_qns_per_round,
                         )
-                    
+
                     except Exception as e:
                         res = f"ERROR!!!! {traceback.format_exc()}"
                     except KeyboardInterrupt:
@@ -191,7 +226,7 @@ Do not deviate from the above format. Repeat the format template for the answer.
                 exit()
 
             print(res)
-            results[qns_id] = (res,prompt,image_paths)
+            results[qns_id] = (res, prompt, image_paths)
 
     # Update token usage and save the results
     previous_usage = results.get("token_usage", (0, 0, 0))
@@ -200,15 +235,15 @@ Do not deviate from the above format. Repeat the format template for the answer.
     with open(f"./ddi_results/{EXP_NAME}.pkl", "wb") as f:
         pickle.dump(results, f)
 
-        
+
 if __name__ == "__main__":
 
     # for i in range(0, 40, 8):
     #     # main("gpt-4o-2024-05-13",
-    #     #     i, 
-    #     #     i, 
+    #     #     i,
+    #     #     i,
     #     #     50,)
-        
+
     #     # main("Gemini1.5",
     #     #     i, i,
     #     #     50,)
@@ -218,10 +253,10 @@ if __name__ == "__main__":
     #         50,)
 
     # main("gpt-4o-2024-05-13",
-    #     0, 
-    #     0, 
+    #     0,
+    #     0,
     #     50,)
-        
+
     # main("Gemini1.5",
     #     0, 0,
     #     50,)
@@ -231,10 +266,13 @@ if __name__ == "__main__":
     #     50,)
 
     for model in ["Gemini1.5", "gpt-4o-2024-05-13", "claude"]:
-        for seed in [10, 100, 141]:   
-            for num_malignant in [1, 5, 10, 15, 20, 30,]:
-                main(model,
-                num_malignant, 
-                num_malignant, 
-                50,
-                random_seed=seed)
+        for seed in [10, 100, 141]:
+            for num_malignant in [
+                1,
+                5,
+                10,
+                15,
+                20,
+                30,
+            ]:
+                main(model, num_malignant, num_malignant, 50, random_seed=seed)
