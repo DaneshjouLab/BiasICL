@@ -17,8 +17,9 @@ import pandas as pd
 
 def create_demo(female: int, male: int, random_seed: int = 141) -> pd.DataFrame:
     """Create a demo dataframe from the given number of female and male samples."""
+    dataset_dir = "/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/"
     dataset_name = "chexpert_binary_PNA"
-    demo_frame = pd.read_csv(f"/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/{dataset_name}/demo.csv", index_col=0)
+    demo_frame = pd.read_csv(dataset_dir + "{dataset_name}/demo.csv", index_col=0)
     total_samples = female + male
     
     female_frame = demo_frame[demo_frame.Sex == "Female"]
@@ -58,11 +59,13 @@ def main(
 ):
     """Main function to run the experiment."""
     EXP_NAME = f"chexpert_sex_{female}_{male}_{model}_{num_qns_per_round}"
+    dataset_dir = "/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/"
+    results_dir = "/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/chexpert_results/"
     
     demo_frame = create_demo(female, male, random_seed)
 
     dataset_name = "chexpert_binary_PNA"
-    test_df = pd.read_csv(f"/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/{dataset_name}/test.csv", index_col=0)
+    test_df = pd.read_csv(dataset_dir + f"{dataset_name}/test.csv", index_col=0)
 
     if model.startswith("gpt") or model.startswith("o1"):
         api = GPT4VAPI(model=model, detail=detail)
@@ -79,7 +82,7 @@ def main(
     demo_labels = []
     for i,row in demo_frame.iterrows():
         ans_choice = "B" if row.Sex == "Male" else "A"
-        demo_paths.append('/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/chexpert_binary_PNA/' + row.Path)
+        demo_paths.append(dataset_dir + 'chexpert_binary_PNA/' + row.Path)
         demo_labels.append(ans_choice)
     demo_examples = list(zip(demo_paths, demo_labels))
     
@@ -112,7 +115,7 @@ Answer Choice: {demo[1]}"""
         qns_idx = []
         for idx, row in enumerate(test_df.iloc[start_idx:end_idx].itertuples()):
             qns_idx.append(row.Index)
-            image_paths.append('/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/chexpert_binary_PNA/' + row.Path)
+            image_paths.append(dataset_dir + 'chexpert_binary_PNA/' + row.Path)
             qn_idx = idx + 1
 
             prompt += f"""<<IMG>>Given the image above, answer the following question using the specified format. 
@@ -148,7 +151,7 @@ Do not deviate from the above format. Repeat the format template for the answer.
     previous_usage = results.get("token_usage", (0, 0, 0))
     total_usage = tuple(a + b for a, b in zip(previous_usage, api.token_usage))
     results["token_usage"] = total_usage
-    with open(f"/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/chexpert_results/{EXP_NAME}.pkl", "wb") as f:
+    with open(results_dir + f"{EXP_NAME}.pkl", "wb") as f:
         pickle.dump(results, f)
 
         
