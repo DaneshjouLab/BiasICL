@@ -5,21 +5,26 @@
 # SPDX-License-Identifier: MIT
 # 
 
+# Standard library imports
 import traceback
 import os
-from tqdm import tqdm
 import random
 import pickle
 import numpy as np
-from LMM import GPT4VAPI, GeminiAPI, ClaudeAPI
+
+# Third-party imports
+from tqdm import tqdm
 import pandas as pd
 
+# Local application imports
+from LMM import GPT4VAPI, GeminiAPI, ClaudeAPI
+
+dataset_dir = "/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/"
+results_dir = "/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/chexpert_results/"
 
 def create_demo(female: int, male: int, random_seed: int = 141) -> pd.DataFrame:
     """Create a demo dataframe from the given number of female and male samples."""
-    dataset_dir = "/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/"
-    dataset_name = "chexpert_binary_PNA"
-    demo_frame = pd.read_csv(dataset_dir + "{dataset_name}/demo.csv", index_col=0)
+    demo_frame = pd.read_csv(dataset_dir + "chexpert_binary_PNA/demo.csv", index_col=0)
     total_samples = female + male
     
     female_frame = demo_frame[demo_frame.Sex == "Female"]
@@ -59,8 +64,6 @@ def main(
 ):
     """Main function to run the experiment."""
     EXP_NAME = f"chexpert_sex_{female}_{male}_{model}_{num_qns_per_round}"
-    dataset_dir = "/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/"
-    results_dir = "/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/chexpert_results/"
     
     demo_frame = create_demo(female, male, random_seed)
 
