@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 
 # In-Context Learning and Demographic Biases of Vision Language Models
 
-This repository contains code and data for the paper "In-Context Learning and Demographic Biases of Vision Language Models" (Add paper link here when available).  This work investigates the impact of demographic composition of demonstration prompts on the performance of Vision-Language Models (VLMs) in medical diagnosis using in-context learning (ICL).
+This repository contains code and data for the paper "In-Context Learning and Demographic Biases of Vision Language Models" (arxiv.org/html/2503.02334v1).  This work investigates the impact of demographic composition of demonstration prompts on the performance of Vision-Language Models (VLMs) in medical diagnosis using in-context learning (ICL).
 
 ## Abstract
 
@@ -58,12 +58,14 @@ The code for this project is organized as follows:
    pip install -r requirements.txt
    ```
 
-4. **Download the datasets:** 
+4. **Download the datasets** 
 
-5. **Run the experiments:**
+5. **Run the experiments**
 
 ## Results
 
-The results of the experiments are stored in pkl files ready for preprocessing.  Key findings are summarized in the paper.
+The results of the experiments are stored in pkl files ready for preprocessing.  
+
+Key findings are summarized in the paper.
 https://arxiv.org/pdf/2503.02334v1
 
