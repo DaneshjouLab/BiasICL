@@ -161,7 +161,6 @@ def main(
     for start_idx in tqdm(range(0, len(test_df), num_qns_per_round), desc=EXP_NAME):
         end_idx = min(len(test_df), start_idx + num_qns_per_round)
 
-#         random.shuffle(demo_examples)  already shuffled so don't need to do this 
         prompt = "Please respond with the following format for each question, in the form of a single capital letter specifying which label best describes the image. Do not deviate from the format, because it will be automatically parsed."
         image_paths = [
             i[0] for i in demo_examples
@@ -231,7 +230,7 @@ Do not deviate from the above format. Repeat the format template for the answer.
     previous_usage = results.get("token_usage", (0, 0, 0))
     total_usage = tuple(a + b for a, b in zip(previous_usage, api.token_usage))
     results["token_usage"] = total_usage
-    with open(f"./ddi_results/{EXP_NAME}.pkl", "wb") as f:
+    with open(f"./ddi_results_rebuttal/{EXP_NAME}.pkl", "wb") as f:
         pickle.dump(results, f)
 
         

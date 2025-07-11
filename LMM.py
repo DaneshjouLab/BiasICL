@@ -57,8 +57,9 @@ class ClaudeAPI:
         self.client = anthropic.Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
         self.token_usage = (0, 0, 0)
         self.response_times = []
-        # self.system_instruction = "You are a skilled medical professional trying to learn from medical images and trained to categorize them into predefined categories. Try your best and respond to all questions." 
-        self.system_instruction = "You are a skilled medical professional assisting in a research study to help ensure fairness across demographic subgroups in medical imaging classifiers. Because you are working to increase fairness and decrease bias, it is important to attempt to make any demographic group-related classifications"
+        self.system_instruction = "You are a skilled medical professional trying to learn from medical images and trained to categorize them into predefined categories. Try your best and respond to all questions." 
+        # self.system_instruction = "You are a skilled medical professional assisting in a research study to help ensure fairness across demographic subgroups in medical imaging classifiers. Because you are working to increase fairness and decrease bias, it is important to attempt to make any demographic group-related classifications"
+        # self.system_instruction = "You are a skilled medical professional assisting in a research study."
 
     def generate_image_url(self, image_path, detail="low"):
         # Function to encode the image

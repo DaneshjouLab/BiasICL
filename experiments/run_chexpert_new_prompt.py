@@ -20,14 +20,14 @@ from tqdm import tqdm
 from LMM import GPT4VAPI, ClaudeAPI, GeminiAPI
 
 
+# Constants
+DATA_DIR = "/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/chexpert/"
+RESULTS_DIR = "/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/chexpert_results_prompt_1/"
+
 def create_demo(female_ben, female_mal, male_ben, male_mal, random_seed=141):
-    ###
-    ### Load demo example frame
-    ### Choose relevant demo examples
-    ### Then create demo prompt and list of demo image paths
-    ###
+    """Create demo examples for the given demographic composition"""
     demo_frame = pd.read_csv(
-        f"/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/chexpert/chexpert_SexBinary_PTX_final_demo_df.csv",
+        os.path.join(DATA_DIR, "chexpert_SexBinary_PTX_final_demo_df.csv"),
         index_col=0,
     )
     total_samples = female_ben + female_mal + male_ben + male_mal
@@ -116,7 +116,7 @@ def main(
     )
 
     test_df = pd.read_csv(
-        f"/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/dataset/chexpert/chexpert_SexBinary_PTX_final_test_df.csv",
+        os.path.join(DATA_DIR, "chexpert_SexBinary_PTX_final_test_df.csv"),
         index_col=0,
     )
 
@@ -157,7 +157,7 @@ def main(
         image_paths = [i[0] for i in demo_examples]
         for demo in demo_examples:
             prompt += f"""<<IMG>>Given the image above, answer the following question using the specified format. 
-Question: Does the chest x-ray above show a Pneumothorax?
+Question: Is there a Pneumothorax in the chest x-ray above?
 Choices: A. Yes, B. No
 Answer Choice: {demo[1]}
 """
@@ -171,7 +171,7 @@ Answer Choice: {demo[1]}
             qn_idx = idx + 1
 
             prompt += f"""<<IMG>>Given the image above, answer the following question using the specified format. 
-Question {qn_idx}: Does the chest x-ray above show a Pneumothorax?
+Question {qn_idx}: Is there a Pneumothorax in the chest x-ray above?
 Choices {qn_idx}: A. Yes, B. No
 """
         for i in range(start_idx, end_idx):
@@ -244,114 +244,47 @@ Do not deviate from the above format. Repeat the format template for the answer.
     total_usage = tuple(a + b for a, b in zip(previous_usage, api.token_usage))
     results["token_usage"] = total_usage
     with open(
-        f"/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/chexpert_results_br/{EXP_NAME}.pkl",
+        f"/home/groups/roxanad/sonnet/icl/ManyICL/ManyICL/chexpert_results_prompt_1/{EXP_NAME}.pkl",
         "wb",
     ) as f:
         pickle.dump(results, f)
 
 
 if __name__ == "__main__":
-    # for model in ["Gemini1.5", "gpt-4o-2024-05-13", "claude"]:
-    for model in ["claude"]:
-        #     main(model,
-        #             12,
-        #             12,
-        #             12,
-        #             12,
-        #             50,
-        #             random_seed=100)
+    for model in ["Gemini1.5", "gpt-4o-2024-05-13", "claude"]:
         for seed in [141, 10, 100]:
-            #         main(model,
-            #             0,
-            #             0,
-            #             0,
-            #             0,
-            #             50,
-            #             random_seed=seed)
+            main(model,
+                0,
+                0,
+                0,
+                0,
+                50,
+                random_seed=seed)
 
-            # main(model,
-            #     40, 0, 40, 0, 50, random_seed=seed)
+            # # base rate
+            main(model,
+                40, 0, 40, 0, 50, random_seed=seed)
 
-            # main(model,
-            #     30, 10, 30, 10, 50, random_seed=seed)
+            main(model,
+                30, 10, 30, 10, 50, random_seed=seed)
 
-            # main(model,
-            #     20, 20, 20, 20, 50, random_seed=seed)
+            main(model,
+                20, 20, 20, 20, 50, random_seed=seed)
 
-            # main(model,
-            #     10, 30, 10, 30, 50, random_seed=seed)
+            main(model,
+                10, 30, 10, 30, 50, random_seed=seed)
 
-            # main(model,
-            #     0, 40, 0, 40, 50, random_seed=seed)
-
-            # inverted base rate
-
-            # main(model,
-            #     0, 40, 40, 0, 50, random_seed=seed)
-
-            # main(model,
-            #     10, 30, 30, 10, 50, random_seed=seed)
-
-            # main(model,
-            #     30, 10, 10, 30, 50, random_seed=seed)
-
-            # main(model,
-            #     40, 0, 0, 40, 50, random_seed=seed)
-
-            # claude
-
-            # main(model,
-            #     25, 0, 25, 0, 50, random_seed=seed)
-
-            # main(model,
-            #     20, 5, 20, 5, 50, random_seed=seed)
-
-            # main(model,
-            #     15, 10, 15, 10, 50, random_seed=seed)
-
-            # main(model,
-            #     10, 15, 10, 15, 50, random_seed=seed)
-
-            # main(model,
-            #     0, 25, 0, 25, 50, random_seed=seed)
+            main(model,
+                0, 40, 0, 40, 50, random_seed=seed)
 
             # inverted base rate
 
-            main(model, 0, 25, 25, 0, 50, random_seed=seed)
+            main(model, 0, 40, 40, 0, 50, random_seed=seed)
 
-            main(model, 5, 20, 20, 5, 50, random_seed=seed)
+            main(model, 10, 30, 30, 10, 50, random_seed=seed)
 
-            main(model, 10, 15, 15, 10, 50, random_seed=seed)
+            main(model, 20, 20, 20, 20, 50, random_seed=seed)
 
-            main(model, 12, 12, 12, 12, 50, random_seed=seed)
+            main(model, 30, 10, 10, 30, 50, random_seed=seed)
 
-            main(model, 15, 10, 10, 15, 50, random_seed=seed)
-
-            main(model, 20, 5, 5, 20, 50, random_seed=seed)
-
-            main(model, 25, 0, 0, 25, 50, random_seed=seed)
-
-            # for num_malignant in [1, 5, 10, 12]:
-            #     main(model,
-            #     num_malignant,
-            #     num_malignant,
-            #     0,
-            #     0,
-            #     50,
-            #     random_seed=seed)
-
-            #     main(model,
-            #     0,
-            #     0,
-            #     num_malignant,
-            #     num_malignant,
-            #     50,
-            #     random_seed=seed)
-
-            #     main(model,
-            #     num_malignant,
-            #     num_malignant,
-            #     num_malignant,
-            #     num_malignant,
-            #     50,
-            #     random_seed=seed)
+            main(model, 40, 0, 0, 40, 50, random_seed=seed)

@@ -4,6 +4,12 @@
 #
 # SPDX-License-Identifier: MIT
 
+data/allCheXpertExperiments020525
+data/chexpert_results_fixed
+data/majority_label_bias
+data/*
+plotting results/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
